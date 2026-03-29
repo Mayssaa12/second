@@ -30,27 +30,49 @@ const stories = [
   },
 ];
 
-// Step 3–5: Render list using map()
+// Step 3: List Component
+function List() {
+  return (
+    <ul>
+      {stories.map(function (item) {
+        return (
+          <li key={item.objectID}>
+            <span>
+              <a href={item.url}>{item.title}</a>
+            </span>
+            <span> {item.author}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+// Step 4: Search Component
+function Search() {
+  return (
+    <div>
+      <label htmlFor="search">Search: </label>
+      <input id="search" type="text" />
+    </div>
+  );
+}
+
+// Step 5: Header Component
+function Header() {
+  return <h1>My Hacker Stories</h1>;
+}
+
+// Step 6: App Component
 function App() {
   return (
     <div>
-      {stories.map((story) => (
-        <div key={story.objectID}>
-          <h3>
-            <a href={story.url} target="_blank">{story.title}</a>
-          </h3>
-          <p>Author: {story.author}</p>
-          <span>Points: {story.points}</span> | 
-          <span>Comments: {story.num_comments}</span>
-        </div>
-      ))}
+      <Header />
+      <hr />
+      <Search />
+      <List />
     </div>
   );
 }
 
 export default App;
-
-// Step 7: Reflection
-// Why is map() essential → Because it returns a new array of JSX elements for rendering lists.
-// Why is objectID the correct key? → Because it's unique and stable, unlike array index.
-// What will change with real API? → Instead of fake data, stories will come dynamically from Hacker News API.n
