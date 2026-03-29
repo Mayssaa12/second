@@ -8,7 +8,7 @@
 // num_comments → number of comments
 
 // React key should be objectID because it's unique.
-// This structure is realistic since APIs عادةً ترجع بيانات بهذا الشكل.
+// This structure is realistic since APIs
 
 // Step 2: Fake data outside the component
 const stories = [
