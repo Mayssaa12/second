@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// Step 1: Move data into App
+// Step 1 + 4: Controlled component & initialize state from localStorage
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem("search") || ""
+  );
 
   const stories = [
     {
@@ -23,10 +25,15 @@ const App = () => {
     },
   ];
 
-  // Step 8: Filter stories before passing to List
+  // Step 8: Filter stories
   const filteredStories = stories.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Step 5: useEffect to store searchTerm in localStorage
+  useEffect(() => {
+    localStorage.setItem("search", searchTerm);
+  }, [searchTerm]);
 
   console.log("App re-rendered");
 
@@ -34,13 +41,13 @@ const App = () => {
     <div>
       <Header />
       <hr />
-      <Search onSearch={(event) => setSearchTerm(event.target.value)} />
+      <Search searchTerm={searchTerm} onSearch={(e) => setSearchTerm(e.target.value)} />
       <List stories={filteredStories} />
     </div>
   );
 };
 
-// Step 2: Pass data using props
+// Step 2: Props destructuring
 const List = ({ stories }) => {
   console.log("List re-rendered");
 
@@ -53,7 +60,6 @@ const List = ({ stories }) => {
   );
 };
 
-// Step 3: Extract Item component
 const Item = ({ item }) => (
   <li>
     <span>
@@ -63,19 +69,22 @@ const Item = ({ item }) => (
   </li>
 );
 
-// Step 4–5: Search component with handler from props
-const Search = ({ onSearch }) => {
+const Search = ({ searchTerm, onSearch }) => {
   console.log("Search re-rendered");
 
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={onSearch} />
+      <input
+        id="search"
+        type="text"
+        value={searchTerm}   // Controlled input
+        onChange={onSearch}  // Handler updates state
+      />
     </div>
   );
 };
 
-// Step 5: Header component
 const Header = () => <h1>My Hacker Stories</h1>;
 
 export default App;
