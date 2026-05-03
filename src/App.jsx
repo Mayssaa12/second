@@ -1,12 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-// Step 1 + 4: Controlled component & initialize state from localStorage
+// Part 1: Reusable InputWithLabel
+const InputWithLabel = ({ id, type = "text", value, onInputChange, children }) => (
+  <div>
+    <label htmlFor={id}>{children}</label>
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={onInputChange}
+    />
+  </div>
+);
+
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem("search") || ""
-  );
-
-  const stories = [
+  // Part 2: Initial data separated
+  const initialStories = [
     {
       objectID: 1,
       title: "React Basics",
@@ -25,66 +34,61 @@ const App = () => {
     },
   ];
 
-  // Step 8: Filter stories
+  // Part 2: Stories state
+  const [stories, setStories] = useState(initialStories);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Part 3: Remove handler
+  const handleRemoveStory = (item) => {
+    const newStories = stories.filter(
+      (story) => story.objectID !== item.objectID
+    );
+    setStories(newStories);
+  };
+
+  // Filter stories
   const filteredStories = stories.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Step 5: useEffect to store searchTerm in localStorage
-  useEffect(() => {
-    localStorage.setItem("search", searchTerm);
-  }, [searchTerm]);
-
-  console.log("App re-rendered");
 
   return (
     <div>
       <Header />
       <hr />
       <Search searchTerm={searchTerm} onSearch={(e) => setSearchTerm(e.target.value)} />
-      <List stories={filteredStories} />
+      <List stories={filteredStories} onRemoveItem={handleRemoveStory} />
     </div>
   );
 };
 
-// Step 2: Props destructuring
-const List = ({ stories }) => {
-  console.log("List re-rendered");
+// Part 1: Composition in Search
+const Search = ({ searchTerm, onSearch }) => (
+  <InputWithLabel id="search" value={searchTerm} onInputChange={onSearch}>
+    <strong>Search: </strong>
+  </InputWithLabel>
+);
 
-  return (
-    <ul>
-      {stories.map((item) => (
-        <Item key={item.objectID} item={item} />
-      ))}
-    </ul>
-  );
-};
+const List = ({ stories, onRemoveItem }) => (
+  <ul>
+    {stories.map((item) => (
+      <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+    ))}
+  </ul>
+);
 
-const Item = ({ item }) => (
+const Item = ({ item, onRemoveItem }) => (
   <li>
     <span>
       <a href={item.url}>{item.title}</a>
     </span>
     <span> {item.author}</span>
+    <button type="button" onClick={() => onRemoveItem(item)}>
+      Delete
+    </button>
   </li>
 );
-
-const Search = ({ searchTerm, onSearch }) => {
-  console.log("Search re-rendered");
-
-  return (
-    <div>
-      <label htmlFor="search">Search: </label>
-      <input
-        id="search"
-        type="text"
-        value={searchTerm}   // Controlled input
-        onChange={onSearch}  // Handler updates state
-      />
-    </div>
-  );
-};
 
 const Header = () => <h1>My Hacker Stories</h1>;
 
 export default App;
+
